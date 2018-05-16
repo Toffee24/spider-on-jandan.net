@@ -9,7 +9,6 @@ const mapLimit = require("async/mapLimit")
 
 function getTotalPage() {
     return new Promise(resolve => {
-        resolve(83)
         rp(options(), (err, res, body) => {
             const $ = cheerio.load(body)
             resolve($('span.current-comment-page').eq(0).text())
@@ -18,7 +17,7 @@ function getTotalPage() {
 }
 
 async function start() {
-    const totalPage = 83
+    const totalPage = await getTotalPage()
     rl.setPrompt(`当前总页数为${totalPage},请输入你想抓取的页数（从末尾开始抓取）`)
     rl.prompt()
     rl.on('line', (answer) => {
