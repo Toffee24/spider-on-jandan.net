@@ -6,56 +6,67 @@ const chr = require('./util').chr
 const ord = require('./util').ord
 const options = require('./util').options
 
-const CODEJSLINKURI = 'http://cdn.jandan.net/static/min/d5ede23626d328724a5765b23e13b6f7GomImiDH.11102335.js'
+const getCodeLinkUrl =()=>{
+    return new Promise(resolve => {
+        rp(options(), (error, res, body) => {
+            resolve('http:'+body.match(/(\/\/cdn\.jandan\.net\/static\/min\/)(.*)(.js)/u)[0])
+        })
+    })
+}
 
-const getEcode = () => {
-    return new Promise((resolve, reject) => {
+
+const getEcode = (CODEJSLINKURI) => {
+    return new Promise((resolve) => {
         rp.get(CODEJSLINKURI, (erroe, res, body) => {
             resolve(body.match(/(jandan_load_img)(.+?)(\(e,")(.+?)("\))(.+?)(var\sa=)/u)[4])
         })
     })
 }
 
-const encode = function (m, r) {
-    var r = r ? r : ""
-    var q = 4;
-    r = md5(r);
-    var o = md5(r.substr(0, 16));
-    var n = md5(r.substr(16, 16));
-    var l = m.substr(0, q);
-    var c = o + md5(o + l);
-    var k;
-    m = m.substr(q);
-    k = base64_decode(m)
-    var h = new Array(256);
-    for (var g = 0; g < 256; g++) {
-        h[g] = g
+const encode = function (n, t) {
+    t = t ? t: ''
+    let e = 0
+    let r =4
+    let l
+    t = md5(t)
+    let d = n
+    let p = md5(t.substr(0,16))
+    let o = md5(t.substr(16, 16))
+    let m = n.substr(0,r)
+    let c = p + md5(p + m)
+    n = n.substr(r)
+    l = base64_decode(n)
+    let k = new Array(256)
+    for (let h = 0; h < 256 ;h++) {
+        k[h] = h
     }
-    var b = new Array();
-    for (var g = 0; g < 256; g++) {
-        b[g] = c.charCodeAt(g % c.length)
+    let b = new Array()
+    for (let h = 0 ;h < 256 ;h++) {
+        b[h] = c.charCodeAt(h % c.length)
     }
-    for (var f = g = 0; g < 256; g++) {
-        f = (f + h[g] + b[g]) % 256;
-        tmp = h[g];
-        h[g] = h[f];
-        h[f] = tmp
+    for (let g = h = 0 ;h < 256 ;h++) {
+        g = (g + k[h] + b[h]) % 256
+        tmp = k[h]
+        k[h] = k[g]
+        k[g] = tmp
     }
-    var t = "";
-    k = k.split("");
-    for (var p = f = g = 0; g < k.length; g++) {
-        p = (p + 1) % 256;
-        f = (f + h[p]) % 256;
-        tmp = h[p];
-        h[p] = h[f];
-        h[f] = tmp;
-        t += chr(ord(k[g]) ^ (h[(h[p] + h[f]) % 256]))
+    let u = ""
+    l = l.split("")
+    for (let q = g = h = 0; h < l.length; h++) {
+        q = (q + 1) % 256
+        g = (g + k[q]) % 256
+        tmp = k[q]
+        k[q] = k[g]
+        k[g] = tmp
+        u += chr(ord(l[h]) ^ (k[(k[q] + k[g]) % 256]))
     }
-    return 'http:' + t.substr(26)
+    u = base64_decode(d)
+    return 'http:'+u
 }
 
 module.exports.getIMDBCharacters = async (page,callback) => {
-    const code = await getEcode()
+    const link = await getCodeLinkUrl()
+    const code = await getEcode(link)
     rp(options(page), (error, res, body) => {
         const $ = cheerio.load(body)
         let txt = ''
