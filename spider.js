@@ -5,6 +5,9 @@ const base64_decode = require('./util').base64_decode
 const chr = require('./util').chr
 const ord = require('./util').ord
 const options = require('./util').options
+const Url = require('./orm')
+
+
 
 const getCodeLinkUrl =()=>{
     return new Promise(resolve => {
@@ -64,20 +67,44 @@ const encode = function (n, t) {
     return 'http:'+u
 }
 
+async function asyncForEach(array, callback) {
+    for (let index = 0; index < array.length; index++) {
+        await callback(array[index], index, array)
+    }
+}
+
 module.exports.getIMDBCharacters = async (page,callback) => {
     const link = await getCodeLinkUrl()
     const code = await getEcode(link)
-    rp(options(page), (error, res, body) => {
-        const $ = cheerio.load(body)
-        let txt = ''
-        const imgArr = $('span.img-hash').map((idx, ele) => {
-            return encode(ele.children[0].data, code)
+    let txt = ''
+    const imgArr = await (()=>{
+        return new Promise(resolve => {
+            rp(options(page), (error, res, body) => {
+                const $ = cheerio.load(body)
+
+                const imgArr = $('span.img-hash').map((idx, ele) => {
+                    const url = encode(ele.children[0].data, code)
+                    return url
+                })
+                let newImgArr = []
+                imgArr.map((idx, ele) => {
+                    if(ele){
+                        txt += ele + '\n'
+                        newImgArr.push({
+                            pic_url:ele
+                        })
+                    }
+                })
+                resolve(newImgArr)
+            })
         })
-        imgArr.map((idx, ele) => {
-            if(ele){
-                txt += ele + '\n'
+    })()
+    for(let e of imgArr){
+        await Url.findOrCreate({
+            where:{
+                pic_url:e.pic_url
             }
         })
-        callback(null,txt)
-    })
+    }
+    callback(null,txt)
 }

@@ -5,24 +5,27 @@ let arrPage = []
 let logoPageArr = []
 
 function getLogoFirstPage() {
-    logoPageArr = fs.readFileSync('page.txt','utf-8').split(',')
+    logoPageArr = fs.readFileSync('page.txt', 'utf-8').split(',')
     return logoPageArr[0]
 }
 
 function getPage(page) {
     let option = options(page)
-    request(option,logoPageArr[0])
+    request(option, logoPageArr[0])
 }
 
-function request(options,logoIndex) {
+function request(options, logoIndex) {
     return new Promise((resolve, reject) => {
         rp(options)
             .then(($) => {
                 if ($('.previous-comment-page').length > 0) {
                     const page = $('.previous-comment-page').attr('href').match(/(.*)-(\d+)#comments/u)[2]
-                    if(page === logoIndex){
+                    if (logoPageArr.includes(page)) {
+                        return
+                    }
+                    if (page === logoIndex) {
                         arrPage.pop()
-                        for(let i =arrPage.length-1;i>=0;i--){
+                        for (let i = arrPage.length - 1; i >= 0; i--) {
                             logoPageArr.unshift(arrPage[i])
                         }
                         fs.writeFileSync('page.txt', logoPageArr)
@@ -58,5 +61,11 @@ function options(page) {
         }
     }
 }
-getLogoFirstPage()
-getPage()
+
+module.exports=function () {
+    return new Promise(resolve => {
+        getLogoFirstPage()
+        getPage()
+        resolve()
+    })
+}
