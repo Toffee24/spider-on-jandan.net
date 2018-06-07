@@ -67,6 +67,10 @@ const encode = function (n, t) {
     return 'http:'+u
 }
 
+function replace_url(url) {
+    return url.replace(/(http.+\/\/.+)(\/.+\/)(.+\..+)/,"$1/large/$3")
+}
+
 async function asyncForEach(array, callback) {
     for (let index = 0; index < array.length; index++) {
         await callback(array[index], index, array)
@@ -83,7 +87,7 @@ module.exports.getIMDBCharacters = async (page,callback) => {
                 const $ = cheerio.load(body)
 
                 const imgArr = $('span.img-hash').map((idx, ele) => {
-                    const url = encode(ele.children[0].data, code)
+                    const url = replace_url(encode(ele.children[0].data, code))
                     return url
                 })
                 let newImgArr = []
