@@ -1,7 +1,11 @@
 
 const Sequelize = require('sequelize')
-const sequelize = new Sequelize('mysql://root:root@localhost:3306/pic_url')
-
+const sequelize = new Sequelize('pic_url','root','root',{
+    host:'localhost',
+    port:'3306',
+    dialect:'mysql',
+    timezone: '+08:00'
+})
 sequelize
     .authenticate()
     .then(() => {
