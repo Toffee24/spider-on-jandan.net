@@ -6,4 +6,3 @@
 
 # notice
 Thread default is 5，you can change it in `main.js`
-pageNumber default request frequency is 1000ms，you can change it in getPageNum.js
