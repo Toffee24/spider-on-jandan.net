@@ -10,9 +10,6 @@ const mapLimit = require("async/mapLimit")
 pageArr = []
 
 function getTotalPage() {
-    /*pageArr = fs.readFileSync('page.txt', 'utf-8').split(',').reverse()
-    pageArr.push('')
-    return pageArr.length*/
     return new Promise(resolve => {
         rp(options(), (err, res, body) => {
             const $ = cheerio.load(body)

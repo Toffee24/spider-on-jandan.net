@@ -1,7 +1,7 @@
 
 const Sequelize = require('sequelize')
-const sequelize = new Sequelize('pic_url', 'root', 'root', {
-    host: 'localhost',
+const sequelize = new Sequelize('jandan_url', 'jandan_url', 'FaX3ACbH3RcfBjcj', {
+    host: '67.216.220.132',
     port: '3306',
     dialect: 'mysql',
     timezone: '+08:00'
@@ -21,12 +21,12 @@ const Url = sequelize.define('url', {
         type: Sequelize.STRING,
     },
     xx: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true,
         defaultValue: null
     },
     oo: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true,
         defaultValue: null
     }

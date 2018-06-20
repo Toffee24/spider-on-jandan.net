@@ -8,11 +8,10 @@ const options = require('./util').options
 const Url = require('./orm')
 
 
-
-const getCodeLinkUrl =()=>{
+const getCodeLinkUrl = () => {
     return new Promise(resolve => {
         rp(options(), (error, res, body) => {
-            resolve('http:'+body.match(/(\/\/cdn\.jandan\.net\/static\/min\/)(.*)(.js)/u)[0])
+            resolve('http:' + body.match(/(\/\/cdn\.jandan\.net\/static\/min\/)(.*)(.js)/u)[0])
         })
     })
 }
@@ -27,27 +26,27 @@ const getEcode = (CODEJSLINKURI) => {
 }
 
 const encode = function (n, t) {
-    t = t ? t: ''
+    t = t ? t : ''
     let e = 0
-    let r =4
+    let r = 4
     let l
     t = md5(t)
     let d = n
-    let p = md5(t.substr(0,16))
+    let p = md5(t.substr(0, 16))
     let o = md5(t.substr(16, 16))
-    let m = n.substr(0,r)
+    let m = n.substr(0, r)
     let c = p + md5(p + m)
     n = n.substr(r)
     l = base64_decode(n)
     let k = new Array(256)
-    for (let h = 0; h < 256 ;h++) {
+    for (let h = 0; h < 256; h++) {
         k[h] = h
     }
     let b = new Array()
-    for (let h = 0 ;h < 256 ;h++) {
+    for (let h = 0; h < 256; h++) {
         b[h] = c.charCodeAt(h % c.length)
     }
-    for (let g = h = 0 ;h < 256 ;h++) {
+    for (let g = h = 0; h < 256; h++) {
         g = (g + k[h] + b[h]) % 256
         tmp = k[h]
         k[h] = k[g]
@@ -64,11 +63,11 @@ const encode = function (n, t) {
         u += chr(ord(l[h]) ^ (k[(k[q] + k[g]) % 256]))
     }
     u = base64_decode(d)
-    return 'http:'+u
+    return 'http:' + u
 }
 
 function replace_url(url) {
-    return url.replace(/(http.+\/\/.+)(\/.+\/)(.+\..+)/,"$1/large/$3")
+    return url.replace(/(http.+\/\/.+)(\/.+\/)(.+\..+)/, "$1/large/$3")
 }
 
 async function asyncForEach(array, callback) {
@@ -77,38 +76,61 @@ async function asyncForEach(array, callback) {
     }
 }
 
-module.exports.getIMDBCharacters = async (page,callback) => {
+module.exports.getIMDBCharacters = async (page, callback) => {
     const link = await getCodeLinkUrl()
     const code = await getEcode(link)
     let txt = ''
-    const imgArr = await (()=>{
+    const imgArr = await (() => {
         return new Promise(resolve => {
             rp(options(page), (error, res, body) => {
                 const $ = cheerio.load(body)
-
-                const imgArr = $('span.img-hash').map((idx, ele) => {
-                    const url = replace_url(encode(ele.children[0].data, code))
-                    return url
-                })
-                let newImgArr = []
-                imgArr.map((idx, ele) => {
-                    if(ele){
-                        txt += ele + '\n'
-                        newImgArr.push({
-                            pic_url:ele
-                        })
+                const $imgItem = Array.from($('.commentlist').children('li').filter('[id]'))
+                let imgArr = []
+                $imgItem.forEach((ele, idx) => {
+                    const imgHashEle = $(ele).find('span.img-hash')
+                    const imgLength = imgHashEle.length
+                    const jandanVote = $(ele).find('.jandan-vote')
+                    const oo = Number.parseInt(jandanVote.find('.tucao-like-container span').text())
+                    const xx = Number.parseInt(jandanVote.find('.tucao-unlike-container span').text())
+                    let obj = {
+                        xx: xx,
+                        oo: oo
+                    }
+                    for (let i = 0; i < imgLength; i++) {
+                        const url = replace_url(encode(imgHashEle.eq(i).text(), code))
+                        obj.url = url
+                        imgArr.push(obj)
                     }
                 })
-                resolve(newImgArr)
+                imgArr.map((ele, idx) => {
+                    if (ele) {
+                        txt += ele.url + '\n'
+                    }
+                })
+                resolve(imgArr)
             })
         })
     })()
-    for(let e of imgArr){
-        await Url.findOrCreate({
-            where:{
-                pic_url:e.pic_url
+    for (let e of imgArr) {
+        await Url.findOne({
+            where: {
+                pic_url: e.url
+            }
+        }).then(result => {
+            if (result) {
+                result.update({
+                    oo: e.oo,
+                    xx: e.xx,
+                    pic_url: e.url
+                })
+            } else {
+                Url.create({
+                    pic_url: e.url,
+                    oo: e.oo,
+                    xx: e.xx
+                })
             }
         })
     }
-    callback(null,txt)
+    callback(null, txt)
 }
