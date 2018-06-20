@@ -1,7 +1,7 @@
 
 const Sequelize = require('sequelize')
-const sequelize = new Sequelize('jandan_url', 'jandan_url', 'FaX3ACbH3RcfBjcj', {
-    host: '67.216.220.132',
+const sequelize = new Sequelize('jandan_url', 'root', 'root', {
+    host: 'localhost',
     port: '3306',
     dialect: 'mysql',
     timezone: '+08:00'

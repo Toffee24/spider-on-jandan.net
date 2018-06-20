@@ -2,7 +2,7 @@ const crypto = require('crypto')
 const c = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
 
 module.exports.md5 = function (s) {
-    const m = crypto.createHash('md5');
+    const m = crypto.createHash('md5')
     return m.update(s).digest('hex')
 }
 
