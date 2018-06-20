@@ -92,11 +92,11 @@ module.exports.getIMDBCharacters = async (page, callback) => {
                     const jandanVote = $(ele).find('.jandan-vote')
                     const oo = Number.parseInt(jandanVote.find('.tucao-like-container span').text())
                     const xx = Number.parseInt(jandanVote.find('.tucao-unlike-container span').text())
-                    let obj = {
-                        xx: xx,
-                        oo: oo
-                    }
                     for (let i = 0; i < imgLength; i++) {
+                        let obj = {
+                            xx: xx,
+                            oo: oo
+                        }
                         const url = replace_url(encode(imgHashEle.eq(i).text(), code))
                         obj.url = url
                         imgArr.push(obj)
