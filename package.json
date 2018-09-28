@@ -3,6 +3,7 @@
     "async": "^2.6.0",
     "cheerio": "^1.0.0-rc.2",
     "mysql2": "^1.5.3",
+    "nodemailer": "^4.6.8",
     "request": "^2.85.0",
     "request-promise": "^4.2.2",
     "sequelize": "^4.37.10"

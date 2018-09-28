@@ -7,7 +7,7 @@ module.exports.md5 = function (s) {
 }
 
 module.exports.base64_decode = function (g) {
-    var j = String(g).replace(/[=]+$/, "");
+    var j = String(g).replace(/[=]+$/, "")
     if (j.length % 4 == 1) {
         throw new a("'atob' failed: The string to be decoded is not correctly encoded.")
     }
@@ -21,18 +21,19 @@ module.exports.base64_decode = function (g) {
 module.exports.chr = function (a) {
     return String.fromCharCode(a)
 }
+
 module.exports.ord = function (a) {
     return a.charCodeAt()
 }
 
 module.exports.time = function () {
-    var a = new Date().getTime();
+    var a = new Date().getTime()
     return parseInt(a / 1000)
 }
 
 module.exports.options = (pageNum) => {
     return {
-        uri: pageNum?`http://jandan.net/ooxx/page-${pageNum}#comments`:'http://jandan.net/ooxx',
+        uri: pageNum ? `http://jandan.net/ooxx/page-${pageNum}#comments` : 'http://jandan.net/ooxx',
         method: 'get',
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36',
