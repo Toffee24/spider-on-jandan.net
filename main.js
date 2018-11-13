@@ -58,10 +58,17 @@ async function start() {
 //        process.exit(0)
 //    })
 }
-process.on('uncaughtException', function(err) {
-  console.log(err)
-  sendMail(err.stack)
-})
 
+let count = 0
+process.on('uncaughtException', function(err) {
+  if(count < 5){
+		setTimeout(()=>{
+			count++
+			start()
+    },5000)
+  }else{
+		sendMail(err.stack)
+	}
+})
 
 start()
